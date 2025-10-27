@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALX Quiz Helper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 380px;
+            min-height: 500px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-bottom: 3px solid #ff6600;
+        }
+        
+        .header .emoji {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .header p {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        /* Content */
+        .content {
+            padding: 16px;
+            background: white;
+        }
+        
+        /* Messages */
+        .message {
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+        }
+        
+        .success-message {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #373;
+        }
+        
+        /* Cards */
+        .card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid #e8e8e8;
+        }
+        
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 12px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #5a6c7d;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .status-good { background: #10b981; }
+        .status-warning { background: #f59e0b; }
+        .status-error { background: #ef4444; }
+        
+        /* Buttons */
+        .button {
+            width: 100%;
+            padding: 11px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        
+        .button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6600, #ff8533);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #5a6c7d;
+            border: 1px solid #d0d0d0;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        /* Settings */
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-label {
+            font-size: 12px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        .toggle input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #ff6600, #ff8533);
+        }
+        
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        
+        /* Slider */
+        .slider-group {
+            padding: 10px 0;
+        }
+        
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .slider-value {
+            background: #ff6600;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff6600;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff6600;
+            cursor: pointer;
+            border: none;
+        }
+        
+        /* Instructions */
+        .instructions {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 11px;
+            line-height: 1.5;
+            border: 1px dashed #d0d0d0;
+        }
+        
+        .instructions h4 {
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .instructions ol {
+            margin: 0;
+            padding-left: 18px;
+        }
+        
+        .instructions li {
+            margin-bottom: 4px;
+            color: #5a6c7d;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ff6600;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .divider {
+            height: 1px;
+            background: #e8e8e8;
+            margin: 12px 0;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <span class="emoji">🎯</span>
+        <h1>ALX Quiz Helper</h1>
+        <p>Smart quiz assistance for ALX Savanna</p>
+    </div>
+    
+    <!-- Content -->
+    <div class="content">
+        <!-- Messages -->
+        <div id="errorMessage" class="message error-message">
+            <strong>Error:</strong> <span id="errorText"></span>
+        </div>
+        
+        <div id="successMessage" class="message success-message">
+            <strong>Success:</strong> <span id="successText"></span>
+        </div>
+        
+        <!-- Status Card -->
+        <div class="card">
+            <div class="card-title">
+                <span>📊</span>
+                <span>Data Status</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-value">
+                    <span id="dataStatusIndicator" class="status-indicator status-error"></span>
+                    <span id="dataStatusText">Loading...</span>
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Questions</span>
+                <span class="info-value" id="questionCount">0</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Last Updated</span>
+                <span class="info-value" id="dataAge">Unknown</span>
+            </div>
+        </div>
+        
+        <!-- Analysis Card (Hidden by default) -->
+        <div id="analysisCard" class="card" style="display: none;">
+            <div class="card-title">
+                <span>🔍</span>
+                <span>Question Analysis</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Subject</span>
+                <span id="questionSubject" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Difficulty</span>
+                <span id="questionDifficulty" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Confidence</span>
+                <span id="answerConfidence" class="info-value">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Validation</span>
+                <span id="answerValidation" class="info-value">-</span>
+            </div>
+        </div>
+        
+        <!-- Payment Bypass Card -->
+        <div class="card" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-color: #7dd3fc;">
+            <div class="card-title" style="color: #0369a1;">
+                <span>🔓</span>
+                <span>Payment Bypass</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-value" style="color: #059669;">
+                    <span class="status-indicator status-good"></span>
+                    <span>Active</span>
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Bypassed</span>
+                <span class="info-value" id="bypassCount" style="color: #0369a1;">0</span>
+            </div>
+            <button id="triggerBypassBtn" class="button btn-secondary" style="margin-top: 10px; background: white; border: 1px solid #7dd3fc; color: #0369a1;">
+                <span>🔓</span>
+                <span>Manual Bypass</span>
+            </button>
+        </div>
+        
+        <!-- Settings Card -->
+        <div class="card">
+            <div class="card-title">
+                <span>⚙️</span>
+                <span>Settings</span>
+            </div>
+            
+            <div class="setting-item">
+                <span class="setting-label">
+                    <span>💬</span>
+                    <span>Show Popup</span>
+                </span>
+                <label class="toggle">
+                    <input type="checkbox" id="showPopupAnswer" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div class="setting-item">
+                <span class="setting-label">
+                    <span>🎨</span>
+                    <span>Highlight Answers</span>
+                </span>
+                <label class="toggle">
+                    <input type="checkbox" id="showPageHighlight" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span class="setting-label">⏱️ Auto-hide Duration</span>
+                    <span id="durationValue" class="slider-value">45s</span>
+                </div>
+                <input type="range" id="popupDuration" class="slider" min="5" max="120" value="45" step="5">
+            </div>
+            
+            <button id="saveSettings" class="button btn-primary" style="margin-top: 8px;">
+                <span>💾</span>
+                <span>Save Settings</span>
+            </button>
+        </div>
+        
+        <!-- Loading State -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <div style="color: #5a6c7d; font-weight: 500;">Processing...</div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div id="controls">
+            <button id="captureBtn" class="button btn-primary">
+                <span>📚</span>
+                <span>Capture Corrections</span>
+            </button>
+            
+            <button id="assistBtn" class="button btn-success">
+                <span>🎯</span>
+                <span>Smart Assist</span>
+            </button>
+            
+            <div class="button-grid">
+                <button id="clearBtn" class="button btn-secondary">
+                    <span>🧹</span>
+                    <span>Clear</span>
+                </button>
+                
+                <button id="refreshBtn" class="button btn-secondary">
+                    <span>🔄</span>
+                    <span>Refresh</span>
+                </button>
+            </div>
+            
+            <div class="button-grid">
+                <button id="searchBtn" class="button btn-secondary">
+                    <span>🔍</span>
+                    <span>Search</span>
+                </button>
+                
+                <button id="exportBtn" class="button btn-secondary">
+                    <span>📤</span>
+                    <span>Export</span>
+                </button>
+            </div>
+            
+            <button id="dataManagerBtn" class="button btn-secondary">
+                <span>🗂️</span>
+                <span>Manage Data</span>
+            </button>
+            
+            <div class="divider"></div>
+            
+            <button id="clearAllBtn" class="button btn-danger">
+                <span>🗑️</span>
+                <span>Clear All Data</span>
+            </button>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="instructions">
+            <h4>📋 Quick Guide</h4>
+            <ol>
+                <li>Go to quiz correction page</li>
+                <li>Click "Capture Corrections"</li>
+                <li>Navigate to quiz page</li>
+                <li>Click "Smart Assist" for help</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+{
+  "manifest_version": 3,
+  "name": "ALX Quiz Helper & Payment Bypass",
+  "version": "1.0.8",
+  "version_name": "1.0.8",
+  "description": "Advanced quiz assistance and payment wall bypass for ALX platform",
+  
+  "permissions": [
+    "storage",
+    "notifications",
+    "scripting",
+    "activeTab",
+    "tabs"
+  ],
+  
+  "host_permissions": [
+    "https://savanna.alxafrica.com/*",
+    "*://*.alxafrica.com/*"
+  ],
+  
+  "background": {
+    "service_worker": "background.js"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["https://savanna.alxafrica.com/*"],
+      "js": [
+        "storage.js", 
+        "utils/error-handling.js", 
+        "utils/visual-feedback.js", 
+        "utils/confidence-system.js",
+        "utils/question-analyzer.js",
+        "utils/answer-validator.js",
+        "utils/export-manager.js",
+        "utils/advanced-search.js",
+        "utils/dom-cache.js",
+        "utils/advanced-matcher.js",
+        "workers/question-matcher.js",
+        "content-scripts/capture.js", 
+        "content-scripts/smart-answer.js",
+        "content-scripts/payment-bypass.js"
+      ],
+      "run_at": "document_end",
+      "all_frames": false
+    },
+    {
+      "matches": ["*://*.alxafrica.com/*"],
+      "js": ["content-scripts/payment-bypass.js"],
+      "run_at": "document_end",
+      "all_frames": false
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "ALX Quiz Helper"
+  },
+  
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": ["data-manager/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

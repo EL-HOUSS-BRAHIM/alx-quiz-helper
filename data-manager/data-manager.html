@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALX Quiz Helper - Data Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6600 0%, #e55a00 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .stats-bar {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #ff6600;
+            font-size: 18px;
+        }
+        
+        .actions-bar {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .button-primary {
+            background: #ff6600;
+            color: white;
+        }
+        
+        .button-primary:hover {
+            background: #e55a00;
+        }
+        
+        .button-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .button-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .button-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .button-danger:hover {
+            background: #c82333;
+        }
+        
+        .button-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .button-success:hover {
+            background: #218838;
+        }
+        
+        .table-container {
+            overflow: auto;
+            max-height: 70vh;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: top;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .question-text {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .question-text:hover {
+            white-space: normal;
+            overflow: visible;
+        }
+        
+        .answers-list {
+            max-width: 250px;
+        }
+        
+        .answer-item {
+            padding: 2px 6px;
+            margin: 2px 0;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .answer-correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .answer-incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .correct-answer-image {
+            margin: 5px 0;
+            display: inline-block;
+        }
+        
+        .correct-answer-image img {
+            border: 2px solid #10b981;
+            border-radius: 4px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .correct-answer-image img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        
+        .timestamp {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .edit-btn {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .edit-btn:hover {
+            background: #138496;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        
+        /* Test Selection Styles */
+        .test-selection-view {
+            padding: 20px;
+        }
+        
+        .test-selection-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-selection-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .test-selection-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .tests-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .test-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: #ff6600;
+        }
+        
+        .test-card-header {
+            margin-bottom: 15px;
+        }
+        
+        .test-card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+        
+        .test-card-course {
+            font-size: 14px;
+            color: #ff6600;
+            font-weight: 500;
+        }
+        
+        .test-card-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .test-card-questions {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .test-card-date {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .test-card-footer {
+            text-align: center;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        .test-card-action {
+            color: #ff6600;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Question Table View Styles */
+        .question-table-view {
+            padding: 0;
+        }
+        
+        .table-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+        
+        .current-test-info h3 {
+            color: #333;
+            margin: 0 0 5px 0;
+            font-size: 20px;
+        }
+        
+        .current-test-info p {
+            color: #666;
+            margin: 0;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ff6600;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            background: #ff6600;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .close {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .close:hover {
+            opacity: 0.7;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .answer-editor {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .answer-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .success-message, .error-message {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Quiz Data Manager</h1>
+            <p>View, edit, and manage your captured quiz data</p>
+        </div>
+        
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <p>Loading quiz data...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state hidden">
+            <h3>📝 No Quiz Data Found</h3>
+            <p>Capture some quiz corrections first to see data here.</p>
+            <button class="button button-primary" onclick="window.close()">Go Back to Extension</button>
+        </div>
+
+        <!-- Test Selection View -->
+        <div id="testSelectionView" class="test-selection-view hidden">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span>📊 Total Questions:</span>
+                    <span class="stat-value" id="totalQuestions">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>⏰ Data Age:</span>
+                    <span class="stat-value" id="dataAge">Unknown</span>
+                </div>
+                <div class="stat-item">
+                    <span>💾 Storage Size:</span>
+                    <span class="stat-value" id="storageSize">0 KB</span>
+                </div>
+            </div>
+            
+            <div class="test-selection-header">
+                <h2>📚 Select a Test to View</h2>
+                <p>Choose from your captured quiz tests below:</p>
+            </div>
+            <div id="testsContainer" class="tests-container">
+                <!-- Test cards will be inserted here -->
+            </div>
+            
+            <div class="actions-bar">
+                <div style="flex: 1;"></div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="exportBtn" class="button button-success">📤 Export JSON</button>
+                    <button id="csvExportBtn" class="button button-success" style="background: #17a2b8;">📊 Export CSV</button>
+                    <button id="detailedCsvExportBtn" class="button button-success" style="background: #6f42c1;">📋 Detailed CSV</button>
+                    <button id="importBtn" class="button button-secondary">📥 Import</button>
+                    <button id="clearBtn" class="button button-danger">🗑️ Clear All</button>
+                    <button id="refreshBtn" class="button button-primary">🔄 Refresh</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Table View -->
+        <div id="questionTableView" class="question-table-view hidden">
+            <div class="table-header">
+                <button id="backToTestsBtn" class="button button-secondary">← Back to Tests</button>
+                <div class="current-test-info">
+                    <h3 id="currentTestName">Test Name</h3>
+                    <p id="currentCourseInfo">Course Information</p>
+                </div>
+            </div>
+            
+            <div class="actions-bar">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search questions...">
+                    <button class="button button-primary" onclick="searchData()">🔍 Search</button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="exportBtn" class="button button-success">📤 Export JSON</button>
+                    <button id="csvExportBtn" class="button button-success" style="background: #17a2b8;">📊 Export CSV</button>
+                    <button id="detailedCsvExportBtn" class="button button-success" style="background: #6f42c1;">📋 Detailed CSV</button>
+                    <button id="importBtn" class="button button-secondary">📥 Import</button>
+                    <button id="clearBtn" class="button button-danger">🗑️ Clear All</button>
+                    <button id="refreshBtn" class="button button-primary">🔄 Refresh</button>
+                </div>
+            </div>
+            
+            <div id="tableContainer" class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Question</th>
+                            <th>Answers</th>
+                            <th>Captured</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Question Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Edit Question</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="modalMessage"></div>
+                
+                <div class="form-group">
+                    <label class="form-label">Question Text:</label>
+                    <textarea class="form-textarea" id="editQuestionText" placeholder="Enter question text..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Answers:</label>
+                    <div id="answersEditor">
+                        <!-- Answer editors will be inserted here -->
+                    </div>
+                    <button class="button button-secondary" onclick="addAnswer()">➕ Add Answer</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="button button-secondary">Cancel</button>
+                <button class="button button-primary" onclick="saveQuestion()">💾 Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden file input for import -->
+    <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileImport(event)">
+    
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content" style="max-width: 90%; max-height: 90%;">
+            <div class="modal-header">
+                <h2>Correct Answer Image</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 20px;">
+                <img id="modalImage" style="max-width: 100%; max-height: 70vh; object-fit: contain;">
+                <div id="imageInfo" style="margin-top: 15px; font-size: 14px; color: #666;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="button button-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../storage.js"></script>
+    <script src="data-manager.js"></script>
+</body>
+</html>
