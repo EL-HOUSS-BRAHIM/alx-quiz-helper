@@ -10,7 +10,7 @@ const BACKGROUND_CONFIG = {
   CLEANUP_INTERVAL: 30 * 60 * 1000, // Clean up every 30 minutes
   NOTIFICATION_DURATION: 5000,       // Auto-clear notifications after 5 seconds
   UPDATE_CHECK_INTERVAL: 24 * 60 * 60 * 1000, // Check for updates every 24 hours
-  GITHUB_REPO: 'YOUR_USERNAME/YOUR_REPO' // Update with your GitHub repo
+  GITHUB_REPO: 'EL-HOUSS-BRAHIM/alx-quiz-helper'
 };
 
 // Track notification cleanup timers
