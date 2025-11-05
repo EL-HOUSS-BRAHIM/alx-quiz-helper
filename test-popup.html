@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popup Test Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #ff6600; }
+        h2 { color: #333; border-bottom: 2px solid #ff6600; padding-bottom: 10px; }
+        button {
+            background: #ff6600;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover { background: #ff8533; }
+        .success { color: #10b981; font-weight: bold; }
+        .error { color: #ef4444; font-weight: bold; }
+        .info { color: #3b82f6; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 4px solid #ff6600;
+        }
+        .status-box {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 ALX Quiz Helper - Popup Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>Extension Status</h2>
+        <p>Open your browser console (F12) to see detailed logs.</p>
+        <button onclick="checkExtension()">Check Extension</button>
+        <button onclick="testStorage()">Test Storage</button>
+        <button onclick="clearConsole()">Clear Console</button>
+        <div id="status" class="status-box"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Quick Tests</h2>
+        <button onclick="testBackgroundConnection()">Test Background Connection</button>
+        <button onclick="testContentScript()">Test Content Script</button>
+        <button onclick="viewStorageData()">View All Storage</button>
+        <div id="test-results" class="status-box"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Manual Reload Steps</h2>
+        <ol>
+            <li>Go to <code>chrome://extensions/</code></li>
+            <li>Find "ALX Quiz Helper & Payment Bypass"</li>
+            <li>Click the 🔄 <strong>Reload</strong> button</li>
+            <li>Come back and click "Check Extension" above</li>
+            <li>Try opening the popup by clicking the extension icon</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Popup Behavior</h2>
+        <ul>
+            <li>✅ Popup should open when clicking extension icon</li>
+            <li>✅ All buttons should be visible and clickable</li>
+            <li>✅ Status should show "Loading..." then update</li>
+            <li>✅ Settings toggles should work</li>
+            <li>✅ No red errors in popup console</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>Console Logs to Look For</h2>
+        <pre>popup.js: Script loaded, document.readyState: complete
+popup.js: DOM already ready, initializing immediately
+initElements: Starting element initialization...
+initElements: All elements found successfully
+init: Starting popup initialization...
+setupEventListeners: All listeners set up
+init: Initialization completed successfully</pre>
+    </div>
+
+    <div class="test-section">
+        <h2>Debugging Tips</h2>
+        <ul>
+            <li><strong>Inspect Popup:</strong> Right-click on popup → Inspect</li>
+            <li><strong>Check Background:</strong> chrome://extensions/ → Details → Inspect views</li>
+            <li><strong>View Errors:</strong> Look for red text in console</li>
+            <li><strong>Test on ALX page:</strong> Navigate to savanna.alxafrica.com first</li>
+        </ul>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            statusDiv.innerHTML += `<div class="${className}">${new Date().toLocaleTimeString()}: ${message}</div>`;
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+
+        function clearConsole() {
+            console.clear();
+            document.getElementById('status').innerHTML = '<div class="success">Console cleared!</div>';
+            document.getElementById('test-results').innerHTML = '';
+        }
+
+        async function checkExtension() {
+            showStatus('Checking extension installation...', 'info');
+            
+            try {
+                // Check if chrome.runtime is available
+                if (typeof chrome !== 'undefined' && chrome.runtime) {
+                    showStatus('✅ Chrome extension API available', 'success');
+                    
+                    // Get extension ID
+                    const extensionId = chrome.runtime.id;
+                    if (extensionId) {
+                        showStatus(`✅ Extension ID: ${extensionId}`, 'success');
+                    }
+                    
+                    // Try to get manifest
+                    const manifest = chrome.runtime.getManifest();
+                    if (manifest) {
+                        showStatus(`✅ Extension: ${manifest.name} v${manifest.version}`, 'success');
+                    }
+                } else {
+                    showStatus('❌ Chrome extension API not available', 'error');
+                    showStatus('This test must be run from an extension page or with extension context', 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testStorage() {
+            showStatus('Testing storage access...', 'info');
+            
+            try {
+                const result = await chrome.storage.local.get(null);
+                const keys = Object.keys(result);
+                showStatus(`✅ Storage accessible: ${keys.length} items found`, 'success');
+                
+                if (result.quiz_corrections_data) {
+                    showStatus(`✅ Quiz data found: ${result.quiz_corrections_data.length} questions`, 'success');
+                } else {
+                    showStatus('ℹ️ No quiz data stored yet', 'info');
+                }
+            } catch (error) {
+                showStatus(`❌ Storage error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testBackgroundConnection() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="info">Testing background connection...</div>';
+            
+            try {
+                const response = await chrome.runtime.sendMessage({ action: 'getStorageInfo' });
+                if (response && response.success) {
+                    resultsDiv.innerHTML = `<div class="success">✅ Background connected successfully!</div>
+                                          <pre>${JSON.stringify(response.info, null, 2)}</pre>`;
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Background response failed</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Connection error: ${error.message}</div>`;
+            }
+        }
+
+        async function testContentScript() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="info">Testing content script (must be on ALX page)...</div>';
+            
+            try {
+                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                if (tabs[0]) {
+                    const response = await chrome.tabs.sendMessage(tabs[0].id, { action: 'test' });
+                    resultsDiv.innerHTML = `<div class="success">✅ Content script responded!</div>
+                                          <pre>${JSON.stringify(response, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Content script not available: ${error.message}</div>
+                                       <div class="info">Note: Navigate to savanna.alxafrica.com first</div>`;
+            }
+        }
+
+        async function viewStorageData() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="info">Loading all storage data...</div>';
+            
+            try {
+                const result = await chrome.storage.local.get(null);
+                const formatted = {
+                    'Total Items': Object.keys(result).length,
+                    'Quiz Data': result.quiz_corrections_data ? result.quiz_corrections_data.length + ' questions' : 'None',
+                    'Timestamp': result.quiz_corrections_timestamp ? new Date(result.quiz_corrections_timestamp).toLocaleString() : 'None',
+                    'Settings': result.quizHelperSettings ? 'Present' : 'None'
+                };
+                
+                resultsDiv.innerHTML = `<div class="success">✅ Storage data loaded</div>
+                                       <pre>${JSON.stringify(formatted, null, 2)}</pre>`;
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Failed to load storage: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-run check on page load
+        window.addEventListener('load', () => {
+            showStatus('Test page loaded. Click buttons above to test extension.', 'info');
+        });
+    </script>
+</body>
+</html>
